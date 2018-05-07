@@ -1,0 +1,6 @@
+[submodule "lib/LEDUtil"]
+	path = lib/LEDUtil
+	url = ../libraries/LEDUtil
+[submodule "lib/ModuloOps"]
+	path = lib/ModuloOps
+	url = ../libraries/ModuloOps
