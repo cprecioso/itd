@@ -1,5 +1,6 @@
+import Readline from "@serialport/parser-readline"
+import { fromStream } from "most-node-streams"
 import SerialPort from "serialport"
-import { just } from "../node_modules/most"
 import CmdMessenger from "./CmdMessenger"
 import * as config from "./config"
 import setupGame from "./stream"
@@ -10,9 +11,14 @@ const serial = new SerialPort(config.serial.port, {
 
 const messenger = new CmdMessenger(serial)
 
+const keypress$ = fromStream(process.stdin.pipe(new Readline({}))).map(line =>
+  line.trim()
+)
+const newGameKeypress$ = keypress$.filter(str => str === "s")
+
 const commandsOut$ = setupGame({
   commands$: messenger.commands$,
-  startGame$: just(1).delay(1000)
+  startGame$: newGameKeypress$
 })
 
 commandsOut$.forEach(command => messenger.sendCommand(command))

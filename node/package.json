@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@serialport/parser-delimiter": "^1.0.5",
+    "@serialport/parser-readline": "^1.0.5",
     "fecha": "^2.3.3",
     "lodash": "^4.17.10",
     "most": "^1.7.3",
