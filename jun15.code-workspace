@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "arduino"
+		},
+		{
+			"path": "node"
+		}
+	],
+	"settings": {
+		"terminal.integrated.env.osx": {
+			"PATH": "/Users/carlos/.platformio/penv/bin:/Users/carlos/.platformio/penv:/Users/carlos/.local/bin/luna-studio:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin",
+			"PLATFORMIO_CALLER": "vscode"
+		},
+		"typescript.tsdk": "node/node_modules/typescript/lib"
+	}
+}

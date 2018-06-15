@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "@serialport/parser-delimiter": "^1.0.5",
+    "fecha": "^2.3.3",
+    "lodash": "^4.17.10",
+    "most": "^1.7.3",
+    "most-node-streams": "^1.0.0",
+    "most-proxy": "^3.3.0",
+    "serialport": "^6.2.0",
+    "tinycolor2": "^1.4.1",
+    "tslib": "^1.9.2"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.109",
+    "@types/node": "^10.3.3",
+    "@types/serialport": "^6.0.2",
+    "@types/tinycolor2": "^1.4.0",
+    "typescript": "^2.9.2"
+  }
+}
