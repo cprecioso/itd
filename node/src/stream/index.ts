@@ -17,16 +17,27 @@ export default function setupGame(external: {
   const stageLoop$: Proxy<GameStage> = proxy()
 
   const gameTimer$ = createGameTimer(stageLoop$.stream)
-  const magnetCount$ = createMagnetStream(commands$).multicast()
+    .tap(console.log.bind(console, "time left"))
+    .multicast()
+
+  gameTimer$.drain()
+
+  const magnetCount$ = createMagnetStream(
+    stageLoop$.stream,
+    commands$
+  ).multicast()
+
   const leds$ = createLedStream(stageLoop$.stream, {
     foodQuantity$: magnetCount$,
     timeLeft$: gameTimer$
   })
-  const { printCommands$, printDone$ } = createPrinterStream(
+  const printerStreams = createPrinterStream(
     commands$,
     stageLoop$.stream,
     magnetCount$
   )
+  const printCommands$ = printerStreams.printCommands$.multicast()
+  const printDone$ = printerStreams.printDone$.multicast()
 
   stageLoop$.attach(
     createStageLoop(printDone$, { startGame$: external.startGame$ }).multicast()

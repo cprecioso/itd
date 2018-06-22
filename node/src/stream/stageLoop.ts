@@ -11,7 +11,7 @@ export default function createStageLoop(
   }
 ): StageLoop {
   const stagesStreams: StageMap<($: Stream<GameStage>) => Stream<GameStage>> = {
-    [GameStage.Semaphore]: $ => $.thru(untilWait(5)),
+    [GameStage.Semaphore]: $ => $.thru(untilWait(7)),
     [GameStage.Game]: $ => $.thru(untilWait(game.time)),
     [GameStage.Processing]: $ => $.until(printerDone$),
     [GameStage.Finished]: $ => $.thru(untilWait(5)),
@@ -37,5 +37,5 @@ export default function createStageLoop(
     .switchLatest()
     .startWith(GameStage.Idle)
 
-  return stageLoop$
+  return stageLoop$.tap(stage => console.log("Stage", GameStage[stage]))
 }

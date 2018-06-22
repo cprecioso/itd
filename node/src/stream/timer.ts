@@ -5,7 +5,10 @@ import { createFrameStream } from "./_util"
 export default function createGameTimer(stageLoop$: StageLoop) {
   return stageLoop$
     .filter(stage => stage === GameStage.Game)
-    .map(() => createFrameStream(1))
+    .map(() => _createGameTimer())
     .switchLatest()
-    .map(n => Math.max(game.time - n, 0))
+}
+
+function _createGameTimer() {
+  return createFrameStream(1).map(n => Math.max(game.time - n, 0))
 }

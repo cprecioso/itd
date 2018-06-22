@@ -11,6 +11,7 @@ export const createFrameStream = (fps: number) => {
   return periodic(ms)
     .delay(ms)
     .scan(i => i + 1, 0)
+    .tap(console.log.bind(console, "frame"))
 }
 
 export const frameStream$ = createFrameStream(fps).multicast()
