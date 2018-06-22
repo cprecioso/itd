@@ -1,6 +1,6 @@
+import chroma from "chroma-js"
 import * as _ from "lodash"
 import { combine, from, just, Stream } from "most"
-import tc from "tinycolor2"
 import { Command } from "../CmdMessenger"
 import Commands from "../Commands"
 import { bottomLed, food, game } from "../config"
@@ -8,11 +8,10 @@ import { mapRange } from "../_util"
 import GameStage, { StageLoop, StageMap } from "./stages"
 import { createFrameStream } from "./_util"
 
-type Color = [number, number, number]
+export type Color = [number, number, number]
 
 function hsvToRGB([h, s, v]: Color): Color {
-  const { r, g, b } = tc({ h, s, v }).toRgb()
-  return [r, g, b]
+  return chroma.hsv(h, s, v).rgb()
 }
 
 const colorPart = {
@@ -62,7 +61,7 @@ export default function createLedStream(
           val$
         )
       })()
-      return bottom.tap(console.log.bind(console, "Game lights!"))
+      return bottom //.tap(console.log.bind(console, "Game lights!"))
     },
     [GameStage.Processing]: () => {
       const [r, g, b] = hsvToRGB([234, 100, 100])
@@ -85,10 +84,12 @@ export default function createLedStream(
     [GameStage.Idle]: () => just([Commands.LedChainAll(0, 0, 0)])
   }
 
-  return stageLoop$
-    .tap(console.log.bind(console, "Going in"))
-    .map(stage => ledStreams[stage]())
-    .tap(console.log.bind(console, "Going out"))
-    .switchLatest()
-    .flatMap(arr => from(arr))
+  return (
+    stageLoop$
+      //.tap(console.log.bind(console, "Going in"))
+      .map(stage => ledStreams[stage]())
+      //.tap(console.log.bind(console, "Going out"))
+      .switchLatest()
+      .flatMap(arr => from(arr))
+  )
 }

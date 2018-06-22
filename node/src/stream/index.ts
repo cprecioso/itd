@@ -1,8 +1,8 @@
 import { merge, Stream } from "most"
 import { proxy, Proxy } from "most-proxy"
 import { Command } from "../CmdMessenger"
+import { createColorSensorStream } from "./colorSensor"
 import createLedStream from "./leds"
-import { createMagnetStream } from "./magnets"
 import { createPrinterStream } from "./printer"
 import createStageLoop from "./stageLoop"
 import GameStage from "./stages"
@@ -17,12 +17,12 @@ export default function setupGame(external: {
   const stageLoop$: Proxy<GameStage> = proxy()
 
   const gameTimer$ = createGameTimer(stageLoop$.stream)
-    .tap(console.log.bind(console, "time left"))
+    //.tap(console.log.bind(console, "time left"))
     .multicast()
 
   gameTimer$.drain()
 
-  const magnetCount$ = createMagnetStream(
+  const magnetCount$ = createColorSensorStream(
     stageLoop$.stream,
     commands$
   ).multicast()

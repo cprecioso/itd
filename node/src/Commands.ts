@@ -26,7 +26,7 @@ export const enum CommandNames {
   LedChainAll,
   PrintReceipt,
   PrintDone,
-  Magnet
+  ColorSensor
 }
 
 const Commands = {
@@ -48,7 +48,9 @@ const Commands = {
     n: number
   ) => Command,
   PrintDone: rx(CommandNames.PrintDone) as (cmd: Command) => void,
-  Magnet: rx(CommandNames.Magnet) as (cmd: Command) => [string]
+  ColorSensor: rx(CommandNames.ColorSensor) as (
+    cmd: Command
+  ) => [string, string, string, string]
 }
 
 export default Commands

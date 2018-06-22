@@ -37,5 +37,5 @@ export default function createStageLoop(
     .switchLatest()
     .startWith(GameStage.Idle)
 
-  return stageLoop$.tap(stage => console.log("Stage", GameStage[stage]))
+  return stageLoop$ //.tap(stage => console.log("Stage", GameStage[stage]))
 }

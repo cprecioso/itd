@@ -59,7 +59,7 @@ class CmdMessenger extends EventEmitter {
         })
       ].join(",") + ";"
 
-    console.log("Sending", command)
+    //console.log("Sending", command)
 
     return new Promise(f => {
       this._serialPort.write(command, "ascii", f)
