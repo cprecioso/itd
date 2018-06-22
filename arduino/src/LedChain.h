@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <FastLED.h>
+#include <ChainableLED.h>
 
 #define NUMLEDS 4
 
