@@ -22,12 +22,16 @@ void separator()
 void printReceipt(const char *today, byte n)
 {
 #pragma region Names
-  const static byte namesNum = 3;
+  const static byte namesNum = 7;
   const static __FlashStringHelper *names[] = {
       //NAME        AGE  QTY  RESOURCE
-      F("Marie Colin   17    1      VC18"),
-      F("Jason Copper  29    2    C3H7O2"),
-      F("Eva van Djik   8    1     CX138")};
+      F("Marie Colin   17    1      VC18A"),
+      F("Jason Copper  29    2    C3H7O2B"),
+      F("Carlos Preci  23    1    83JW9JC"),
+      F("Jasmijn de B  76    1    87HW9GF"),
+      F("Xiaoying Che  29    2    C3H7O28"),
+      F("Xinhe Yao     26    Q    C39AKL8"),
+      F("Eva van Djik   8    1     CX1389")};
 #pragma endregion Names
 
   printer.wake();
