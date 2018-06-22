@@ -2,21 +2,10 @@
 #include <Reactduino.h>
 #include <CmdMessenger.h>
 
+#include "Commands.h"
 #include "LedChain.h"
 #include "Printer.h"
-#include "Magnet.h"
-
-enum Commands
-{
-  kAck,
-  kStatus,
-  kReady,
-  kLedChain,
-  kLedChainAll,
-  kPrintReceipt,
-  kPrintDone,
-  kMagnet
-};
+#include "ColorSensor.h"
 
 static CmdMessenger messenger(Serial);
 
@@ -61,14 +50,13 @@ Reactduino app([] {
   });
 #pragma endregion Printer
 
-#pragma region Magnet
-  Magnet::setup();
+#pragma region ColorSensor
+  ColorSensor::setup();
 
-  app.repeat(10, [] {
-    Magnet::read();
-    messenger.sendCmd(kMagnet, Magnet::read());
+  app.repeat(20, [] {
+    ColorSensor::read();
   });
-#pragma endregion Magnet
+#pragma endregion ColorSensor
 
   messenger.sendCmd(kReady);
 });
