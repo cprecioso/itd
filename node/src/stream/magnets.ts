@@ -2,19 +2,8 @@ import * as _ from "lodash"
 import { combineArray, Stream } from "most"
 import { Command } from "../CmdMessenger"
 import { CommandNames } from "../Commands"
-import GameStage, { StageLoop } from "./stages"
 
-export function createMagnetStream(
-  stageLoop$: StageLoop,
-  command$: Stream<Command>
-) {
-  return stageLoop$
-    .filter(stage => stage === GameStage.Game)
-    .map(() => _createMagnetStream(command$))
-    .switchLatest()
-}
-
-function _createMagnetStream(commands$: Stream<Command>) {
+export function createMagnetStream(commands$: Stream<Command>) {
   const bitmask$ = commands$
     .filter(([id]) => id === CommandNames.Magnet)
     .map(
@@ -38,7 +27,7 @@ function _createMagnetStream(commands$: Stream<Command>) {
   const magnetCount$ = combineArray(
     (...counts) => counts.reduce((total, count) => total + count, 0),
     magnetCount$s
-  ).tap(console.log.bind(console, "Magnet count"))
+  )
 
   return magnetCount$
 }

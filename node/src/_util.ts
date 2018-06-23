@@ -5,7 +5,6 @@ export function mapRange(
   toMin: number,
   toMax: number
 ) {
-  console.log("mapRange", amt, fromMin, fromMax, toMin, toMax)
   const ratio = (amt - fromMin) / (fromMax - fromMin)
   return ratio * (toMax - toMin) + toMin
 }
