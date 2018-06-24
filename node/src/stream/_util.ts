@@ -1,16 +1,14 @@
-import { just, never, periodic, Stream } from "most"
-import { fps } from "../config"
+import { just, never, Stream } from "most"
 
-export const endless = <A>(a: A) => never().startWith(a) as Stream<A>
+export const endless = <A>(a: A) => never().startWith(a)
 
-export const untilWait = (s: number) => <A>(stream: Stream<A>) =>
-  stream.until(just(1).delay(s * 1000 /* s to ms */))
+export const untilWait = (s: number) => <A>(in$: Stream<A>) =>
+  in$.until(just(1).delay(s * 1000 /* s to ms */))
 
-export const createFrameStream = (fps: number) => {
-  const ms = 1000 / fps
-  return periodic(ms)
-    .delay(ms)
-    .scan(i => i + 1, 0)
+export const makeHot = <A>(in$: Stream<A>) => {
+  const out$ = in$.multicast()
+  out$.drain()
+  return out$
 }
 
-export const frameStream$ = createFrameStream(fps).multicast()
+export const makeInt = (n: number) => n | 0
