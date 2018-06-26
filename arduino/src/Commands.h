@@ -2,12 +2,7 @@
 
 enum Commands
 {
-  kAck,
   kStatus,
   kReady,
-  kLedChain,
-  kLedChainAll,
-  kPrintReceipt,
-  kPrintDone,
-  kColorSensor
+  kColorIndicatorSet // stripNumber, fillNumber
 };

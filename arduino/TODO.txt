@@ -1,0 +1,4 @@
+LedChains:
+  - 2 are soldered the other way
+  - 1 doesn't connect
+  - Data should be soldered to yellow cable

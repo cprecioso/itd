@@ -1,9 +1,9 @@
-import Readline from "@serialport/parser-readline"
-import { fromStream } from "most-node-streams"
+import { autorun } from "mobx"
 import SerialPort from "serialport"
 import CmdMessenger from "./CmdMessenger"
+import Commands from "./Commands"
 import * as config from "./config"
-import setupGame from "./stream"
+import createPrototype from "./prototype"
 
 const serial = new SerialPort(config.serial.port, {
   baudRate: config.serial.baudRate
@@ -11,14 +11,18 @@ const serial = new SerialPort(config.serial.port, {
 
 const messenger = new CmdMessenger(serial)
 
-const keypress$ = fromStream(process.stdin.pipe(new Readline({}))).map(line =>
-  line.trim()
-)
-const newGameKeypress$ = keypress$.filter(str => str === "s")
+const prototype = createPrototype()
 
-const commandsOut$ = setupGame({
-  commands$: messenger.commands$,
-  startGame$: newGameKeypress$
+messenger.once(`cmd:${Commands.Ready}`, () => {
+  console.log("Ready")
+
+  let i = 1
+  setInterval(() => {
+    prototype.colorIndicators[1].set(i)
+    i = (i + 1) % 7
+  }, 1000)
+
+  autorun(() => {
+    messenger.sendCommand(prototype.colorIndicators[1].command)
+  })
 })
-
-commandsOut$.forEach(command => messenger.sendCommand(command))

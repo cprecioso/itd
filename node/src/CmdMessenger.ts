@@ -1,6 +1,5 @@
 import DelimiterParser from "@serialport/parser-delimiter"
 import { EventEmitter } from "events"
-import { fromReadable } from "most-node-streams"
 import { Duplex } from "stream"
 
 export type Arg = string | number | boolean
@@ -9,32 +8,14 @@ export type Command = [number, Arg[]]
 class CmdMessenger extends EventEmitter {
   constructor(protected readonly _serialPort: Duplex) {
     super()
+    this._serialPort
+      .pipe(new DelimiterParser({ delimiter: ";" }))
+      .on("data", data => {
+        if (typeof data !== "string") data = data.toString("ascii")
+        const [command, ...args] = data.split(",")
+        this.emit(`cmd:${command}`, ...args)
+      })
   }
-
-  public readonly commands$ = (() => {
-    const obs = fromReadable(
-      this._serialPort.pipe(new DelimiterParser({ delimiter: ";" }))
-    )
-      .map(
-        (data: string | Buffer): Command => {
-          const [id, ...args] = (typeof data === "string"
-            ? data
-            : data.toString("ascii")
-          )
-            .trim()
-            .split(",")
-
-          return [parseInt(id), args]
-        }
-      )
-      .multicast()
-
-    obs.forEach(([id, ...args]) => {
-      this.emit(`cmd:${id}`, ...args)
-    })
-
-    return obs
-  })()
 
   sendCommand(id: number, args?: Arg[]): Promise<void>
   sendCommand(command: Command): Promise<void>

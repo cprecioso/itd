@@ -1,9 +1,12 @@
 {
+  "main": "src/index.ts",
   "dependencies": {
     "@serialport/parser-delimiter": "^1.0.5",
     "@serialport/parser-readline": "^1.0.5",
     "fecha": "^2.3.3",
     "lodash": "^4.17.10",
+    "mobx": "^5.0.3",
+    "mobx-state-tree": "^2.2.0",
     "most": "^1.7.3",
     "most-node-streams": "^1.0.0",
     "most-proxy": "^3.3.0",
