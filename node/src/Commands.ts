@@ -1,5 +1,4 @@
-import fromPairs from "lodash/fromPairs"
-import zip from "lodash/zip"
+import * as _ from "lodash"
 import { Command } from "./CmdMessenger"
 
 function tx(id: number) {
@@ -14,7 +13,7 @@ function rx<Ks extends string>(
 
 function rx<Ks extends string>(id: number, keys?: Ks[]) {
   return keys
-    ? (cmd: Command) => fromPairs(zip(keys, cmd[1]))
+    ? (cmd: Command) => _.fromPairs(_.zip(keys, cmd[1]))
     : (cmd: Command) => cmd[1]
 }
 
@@ -26,7 +25,7 @@ export const enum CommandNames {
   LedChainAll,
   PrintReceipt,
   PrintDone,
-  Magnet
+  ColorSensor
 }
 
 const Commands = {
@@ -48,7 +47,9 @@ const Commands = {
     n: number
   ) => Command,
   PrintDone: rx(CommandNames.PrintDone) as (cmd: Command) => void,
-  Magnet: rx(CommandNames.Magnet) as (cmd: Command) => [string]
+  ColorSensor: rx(CommandNames.ColorSensor) as (
+    cmd: Command
+  ) => [string, string, string, string]
 }
 
 export default Commands

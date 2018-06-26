@@ -4,6 +4,7 @@ import SerialPort from "serialport"
 import CmdMessenger from "./CmdMessenger"
 import * as config from "./config"
 import setupGame from "./stream"
+import { makeHot } from "./stream/_util"
 
 const serial = new SerialPort(config.serial.port, {
   baudRate: config.serial.baudRate
@@ -11,9 +12,10 @@ const serial = new SerialPort(config.serial.port, {
 
 const messenger = new CmdMessenger(serial)
 
-const keypress$ = fromStream(process.stdin.pipe(new Readline({}))).map(line =>
-  line.trim()
-)
+const keypress$ = fromStream(process.stdin.pipe(new Readline({})))
+  .map(line => line.trim().toLowerCase())
+  .thru(makeHot)
+
 const newGameKeypress$ = keypress$.filter(str => str === "s")
 
 const commandsOut$ = setupGame({

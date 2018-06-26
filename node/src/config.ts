@@ -21,3 +21,18 @@ export const bottomLed = {
   sat: [100, 60], // %
   val: [70, 100] // %
 }
+
+export const processingStage = {
+  breatheLength: 2, // seconds
+  hue: 234, // degrees
+  sat: 100, // %
+  val: [0, 100] // %
+}
+
+export const colorValues = {
+  red: 6,
+  "#24388a": 3,
+  green: 2,
+  white: 1,
+  black: 0
+}

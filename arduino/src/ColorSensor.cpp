@@ -26,13 +26,13 @@ void read()
 
   Serial.print(kColorSensor);
   Serial.print(comma);
+  Serial.print(clear);
+  Serial.print(comma);
   Serial.print(red);
   Serial.print(comma);
   Serial.print(green);
   Serial.print(comma);
   Serial.print(blue);
-  Serial.print(comma);
-  Serial.print(clear);
   Serial.print(F(";"));
 }
 } // namespace ColorSensor

@@ -1,37 +1,41 @@
 import { merge, Stream } from "most"
 import { proxy, Proxy } from "most-proxy"
 import { Command } from "../CmdMessenger"
+import { createColorSensorStream } from "./colorSensor"
 import createLedStream from "./leds"
-import { createMagnetStream } from "./magnets"
 import { createPrinterStream } from "./printer"
 import createStageLoop from "./stageLoop"
 import GameStage from "./stages"
 import createGameTimer from "./timer"
+import { makeHot } from "./_util"
 
 export default function setupGame(external: {
   commands$: Stream<Command>
   startGame$: Stream<any>
 }) {
-  const commands$ = external.commands$.multicast()
+  const commands$ = external.commands$.thru(makeHot)
 
-  const stageLoop$: Proxy<GameStage> = proxy()
+  const stageLoopProxy: Proxy<GameStage> = proxy()
+  const stageLoop$ = stageLoopProxy.stream.thru(makeHot)
 
-  const gameTimer$ = createGameTimer(stageLoop$.stream)
-  const magnetCount$ = createMagnetStream(commands$).multicast()
-  const leds$ = createLedStream(stageLoop$.stream, {
-    foodQuantity$: magnetCount$,
-    timeLeft$: gameTimer$
+  const timeLeft$ = createGameTimer(stageLoop$)
+  const foodQuantity$ = createColorSensorStream(stageLoop$, commands$)
+
+  const leds$ = createLedStream(stageLoop$, {
+    foodQuantity$,
+    timeLeft$
   })
+
   const { printCommands$, printDone$ } = createPrinterStream(
     commands$,
-    stageLoop$.stream,
-    magnetCount$
+    stageLoop$,
+    foodQuantity$
   )
 
-  stageLoop$.attach(
-    createStageLoop(printDone$, { startGame$: external.startGame$ }).multicast()
+  stageLoopProxy.attach(
+    createStageLoop(printDone$, { startGame$: external.startGame$ })
   )
 
-  const output = merge(leds$, printCommands$)
+  const output = merge(leds$, printCommands$).thru(makeHot)
   return output
 }

@@ -1,11 +1,21 @@
+import { hold } from "@most/hold"
+import { just } from "most"
 import { game } from "../config"
-import GameStage, { StageLoop } from "./stages"
-import { createFrameStream } from "./_util"
+import { StageLoop } from "./stageLoop"
+import GameStage from "./stages"
+import { makeHot, ticker } from "./_util"
 
 export default function createGameTimer(stageLoop$: StageLoop) {
-  return stageLoop$
-    .filter(stage => stage === GameStage.Game)
-    .map(() => createFrameStream(1))
+  const timeElapsed$ = stageLoop$
+    .map(
+      stage =>
+        stage === GameStage.Game
+          ? ticker(1000).map(n => Math.max(game.time - n, 0))
+          : just(0)
+    )
     .switchLatest()
-    .map(n => Math.max(game.time - n, 0))
+    .thru(hold)
+    .thru(makeHot)
+
+  return timeElapsed$
 }

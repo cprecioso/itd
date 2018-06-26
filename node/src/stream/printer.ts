@@ -1,22 +1,30 @@
-import { format } from "fecha"
+import fecha from "fecha"
 import { Stream } from "most"
 import { Command } from "../CmdMessenger"
 import Commands, { CommandNames } from "../Commands"
-import GameStage, { StageLoop } from "./stages"
+import { StageLoop } from "./stageLoop"
+import GameStage from "./stages"
+import { makeHot } from "./_util"
 
 export function createPrinterStream(
   commands$: Stream<Command>,
   stageLoop$: StageLoop,
-  magnetCount$: Stream<number>
+  foodQuantity$: Stream<number>
 ) {
-  const printDone$ = commands$.filter(([id]) => id === CommandNames.PrintDone)
+  const printDone$ = commands$
+    .filter(([id]) => id === CommandNames.PrintDone)
+    .thru(makeHot)
 
   const hasToPrint$ = stageLoop$.filter(gs => gs === GameStage.Processing)
-  const printCommands$ = magnetCount$
+  const printCommands$ = foodQuantity$
     .sampleWith(hasToPrint$)
     .map(count =>
-      Commands.PrintReceipt(format(new Date(), "YYYY-MM-DD hh:mm:ss"), count)
+      Commands.PrintReceipt(
+        fecha.format(new Date(), "YYYY-MM-DD hh:mm:ss"),
+        count
+      )
     )
+    .thru(makeHot)
 
   return { printDone$, printCommands$ }
 }

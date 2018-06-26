@@ -1,14 +1,12 @@
+import { easeQuadInOut } from "d3-ease"
 import * as _ from "lodash"
-import { combine, periodic, Stream } from "most"
+import { Stream } from "most"
 import { fps } from "../config"
-import { makeHot } from "./_util"
+import { makeHot, ticker } from "./_util"
 
 export const frameStream$ = (() => {
   const ms = 1000 / fps
-  return periodic(ms)
-    .delay(ms)
-    .scan(i => i + 1, 0)
-    .thru(makeHot)
+  return ticker(ms).thru(makeHot)
 })()
 
 //#region waves
@@ -60,7 +58,7 @@ export const smooth = (incrementPerSecond: number) => {
   return (in$: Stream<number>) =>
     (in$
       .skipRepeats()
-      .combine((target, frame) => target, frameStream$)
+      .sampleWith(frameStream$)
       .scan(
         (current, target) => {
           if (current === target || current === undefined) {
@@ -76,11 +74,38 @@ export const smooth = (incrementPerSecond: number) => {
       .skip(1) as Stream<number>).thru(makeHot)
 }
 
-export const breatheBetween = _.memoize(
-  (period: number, from: number, to: number) => {
-    const diff = to - from
-    return sineWave(period)
-      .map(n => from + n * diff)
-      .thru(makeHot)
-  }
-)
+type EasingFn = (t: number) => number
+const defaultEase: EasingFn = easeQuadInOut
+
+// export const ease = (duration: number, easingFn = defaultEase) => {
+//   const durationInFrames = duration * fps
+//   const incrementPerFrame = _.times(
+//     durationInFrames + 1,
+//     i => i / durationInFrames
+//   )
+
+//   return (ins$: Stream<number>) =>
+//     ins$
+//       .skipRepeats()
+//       .scan((prev$, target) => {
+//         prev$
+//           .take(1)
+//           .thru(
+//             raceWith<number | undefined>(
+//               frameStream$.take(1).constant(undefined)
+//             )
+//           )
+//           .map(curr => {
+//             if (curr === target || curr == null) return just(target)
+//           })
+//         return just(1)
+//       }, just(undefined as number | undefined))
+//       .thru(makeHot)
+// }
+
+export const breatheBetween = (period: number, from: number, to: number) => {
+  const diff = to - from
+  return sineWave(period)
+    .map(n => from + n * diff)
+    .thru(makeHot)
+}
