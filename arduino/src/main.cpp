@@ -1,62 +1,90 @@
 #include <Arduino.h>
 #include <Reactduino.h>
-#include <CmdMessenger.h>
 
 #include "Commands.h"
-#include "LedChain.h"
+#include "SerialCommand.h"
 #include "Printer.h"
 #include "ColorSensor.h"
+#include "LedChain.h"
+#include "Button.h"
+#include "Display.h"
 
-static CmdMessenger messenger(Serial);
-
-void onUnknownCommand() { messenger.sendCmd(kStatus, F("Unknown command")); }
+void dispatchCommands()
+{
+  if (Serial.available() > 0)
+  {
+    switch ((Command)SerialCommand::read_u8())
+    {
+    case kPrintStart:
+    {
+      const byte n = SerialCommand::read_u8();
+      Printer::printReceipt(n);
+      SerialCommand::write_u8(kPrintDone);
+      break;
+    }
+    case kColorSensorStart:
+    {
+      ColorSensor::start();
+      break;
+    }
+    case kColorSensorStop:
+    {
+      ColorSensor::stop();
+      break;
+    }
+    case kDisplayStart:
+    {
+      Display::startTimer();
+      break;
+    }
+    case kColorIndicatorFill:
+    {
+      const byte i = SerialCommand::read_u8();
+      const byte maxJ = SerialCommand::read_u8();
+      LedChain::fill(i, maxJ);
+      break;
+    }
+    case kScanLightsStart:
+    {
+      LedChain::startScan();
+      break;
+    }
+    default:
+    {
+    }
+    }
+  }
+}
 
 Reactduino app([] {
   Serial.begin(115200);
-  messenger.attach(onUnknownCommand);
-  app.onTick([] { messenger.feedinSerialData(); });
 
-#pragma region LedChain
-  LedChain::setup();
-
-  messenger.attach(kLedChain, [] {
-    const byte n = messenger.readInt16Arg();
-    const byte r = messenger.readInt16Arg();
-    const byte g = messenger.readInt16Arg();
-    const byte b = messenger.readInt16Arg();
-    LedChain::changeLed(n, r, g, b);
-  });
-
-  messenger.attach(kLedChainAll, [] {
-    const byte r = messenger.readInt16Arg();
-    const byte g = messenger.readInt16Arg();
-    const byte b = messenger.readInt16Arg();
-    LedChain::changeLedAll(r, g, b);
-  });
-
-  app.repeat(16, [] {
-    LedChain::frame();
-  });
-#pragma endregion LedChain
-
-#pragma region Printer
   Printer::setup();
 
-  messenger.attach(kPrintReceipt, [] {
-    const char *today = messenger.readStringArg();
-    const byte n = messenger.readInt16Arg();
-    Printer::printReceipt(today, n);
-    messenger.sendCmd(kPrintDone);
-  });
-#pragma endregion Printer
-
-#pragma region ColorSensor
   ColorSensor::setup();
+  app.repeat(20, ColorSensor::read);
 
-  app.repeat(20, [] {
-    ColorSensor::read();
+  LedChain::setup();
+  app.repeat(16, LedChain::frame);
+
+  Button::setup();
+  app.repeat(10, [] {
+    Button::checkButtons();
   });
-#pragma endregion ColorSensor
 
-  messenger.sendCmd(kReady);
+  Display::setup();
+  app.repeat(16, Display::frame);
+
+  app.onTick(dispatchCommands);
+
+  // Give plenty of buffer
+  SerialCommand::write_u8(0);
+  SerialCommand::write_u8(0);
+  SerialCommand::write_u8(0);
+  SerialCommand::write_u8(0);
+  delay(10);
+  SerialCommand::write_u8(0);
+  delay(10);
+  SerialCommand::write_u8(kReady);
+  delay(10);
 });

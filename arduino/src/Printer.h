@@ -7,5 +7,5 @@
 namespace Printer
 {
 void setup();
-void printReceipt(const char *today, byte n);
+void printReceipt(byte n);
 } // namespace Printer

@@ -1,13 +1,20 @@
 #pragma once
 
-enum Commands
+enum Command
 {
-  kAck,
+  kEmpty,
   kStatus,
   kReady,
-  kLedChain,
-  kLedChainAll,
-  kPrintReceipt,
+  kColorIndicatorFill,
+  kPrintStart,
   kPrintDone,
-  kColorSensor
+  kColorSensorStart,
+  kColorSensorStop,
+  kColorSensorData,
+  kDisplayStart,
+  kPressureButtonPressed,
+  kStartButtonPressed,
+  kScanLightsStart
 };
+
+typedef enum Command Command;

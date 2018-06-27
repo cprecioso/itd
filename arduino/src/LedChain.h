@@ -1,14 +1,12 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ChainableLED.h>
-
-#define NUMLEDS 4
+#include <FastLED.h>
 
 namespace LedChain
 {
 void setup();
 void frame();
-void changeLed(byte n, byte r, byte g, byte b);
-void changeLedAll(byte r, byte g, byte b);
+void fill(byte, byte);
+void startScan();
 } // namespace LedChain
