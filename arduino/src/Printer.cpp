@@ -30,7 +30,7 @@ void printReceipt(byte n)
       F("Jasmijn de B  76    1    87HW9GF"),
       F("Xiaoying Che  29    2    C3H7O28"),
       F("Xinhe Yao     26    1    C39AKL8"),
-      F("Eva van Djik   8    1     CX1389")};
+      F("Eva van Dijk   8    1     CX1389")};
 
   printer.wake();
   printer.setDefault();
