@@ -21,16 +21,61 @@ void separator()
 
 void printReceipt(byte n)
 {
-  const static byte namesNum = 7;
+  const static byte namesNum = 6;
   const static __FlashStringHelper *names[] = {
-      //NAME        AGE  QTY  RESOURCE
-      F("Marie Colin   17    1      VC18A"),
-      F("Jason Copper  29    2    C3H7O2B"),
-      F("Carlos Preci  23    1    83JW9JC"),
-      F("Jasmijn de B  76    1    87HW9GF"),
-      F("Xiaoying Che  29    2    C3H7O28"),
-      F("Xinhe Yao     26    1    C39AKL8"),
-      F("Eva van Dijk   8    1     CX1389")};
+      F("Resource VC18A\n"
+        "--------------\n"
+        "Type: Protein\n"
+        "Name: Amino Acid Alpha\n"
+        "Chemical formula: RCHNH2COOH\n"
+        "Amount: 8g\n"
+        "Procedence: China\n"
+        "Owner: Marie Colin, 17\n"),
+
+      F("Resource C3H702B\n"
+        "----------------\n"
+        "Type: Carbohydrates\n"
+        "Name: Fructose\n"
+        "Chemical formula: C6H12O6\n"
+        "Amount: 43g\n"
+        "Procedence: Netherlands\n"
+        "Owner: Jason Copper, 29\n"),
+
+      F("Resource 87HW9GF\n"
+        "----------------\n"
+        "Type: Vitamin\n"
+        "Name: B12\n"
+        "Chemical formula: C63H88CoN14O14P\n"
+        "Amount: 0.025g\n"
+        "Procedence: France\n"
+        "Owner: Carlos Precioso, 23\n"),
+
+      F("Resource C3H7028\n"
+        "----------------\n"
+        "Type: Vitamin\n"
+        "Name: Folic acid\n"
+        "Chemical formula: C19H23N7O6\n"
+        "Amount: 0.1mg\n"
+        "Procedence: Spain\n"
+        "Owner: Jasmijn de Boers, 76\n"),
+
+      F("Resource C39AKL8\n"
+        "----------------\n"
+        "Type: Protein\n"
+        "Name: Glutamic acid\n"
+        "Chemical formula: C5H9NO4\n"
+        "Amount: 0.04mg\n"
+        "Procedence: Netherlands\n"
+        "Owner: Xiaoying Che, 38\n"),
+
+      F("Resource CX1389\n"
+        "---------------\n"
+        "Type: Vitamin\n"
+        "Name: Nicotamide\n"
+        "Chemical formula: C6H6N2O\n"
+        "Amount: 56mg\n"
+        "Procedence: Colombia\n"
+        "Owner: Xinhe Yao, 52\n")};
 
   printer.wake();
   printer.setDefault();
@@ -58,10 +103,7 @@ void printReceipt(byte n)
   printer.setSize('S');
   separator();
   printer.feed(1);
-  printer.boldOn();
-  printer.justify('R');
-  printer.println(F("NAME         AGE  QTY  RESOURCE"));
-  printer.boldOff();
+  printer.justify('L');
 
   const int maxNum = constrain(n, 0, namesNum);
   for (byte i = 0; i < maxNum; i++)
@@ -85,8 +127,7 @@ void printReceipt(byte n)
   separator();
   printer.feed(1);
   printer.justify('C');
-  printer.println(F("Impersonal robbery,"));
-  printer.println(F("Personal suffering."));
+  printer.println(F("Impersonal robbery,\nPersonal suffering."));
   printer.feed(30);
 }
 } // namespace Printer
