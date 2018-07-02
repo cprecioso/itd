@@ -19,6 +19,8 @@ void write_i8(int8_t num);
 
 void write_i16(int16_t num);
 
+void write_u16(uint16_t num);
+
 void write_i32(int32_t num);
 
 } // namespace SerialCommand

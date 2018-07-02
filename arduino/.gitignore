@@ -6,3 +6,5 @@
 .travis.yml
 lib/readme.txt
 .vscode/extensions.json
+.pioenvs
+.piolibdeps

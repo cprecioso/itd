@@ -8,3 +8,7 @@ export function mapRange(
   const ratio = (amt - fromMin) / (fromMax - fromMin)
   return ratio * (toMax - toMin) + toMin
 }
+
+export function delay(ms: number) {
+  return new Promise(f => setTimeout(f, ms))
+}

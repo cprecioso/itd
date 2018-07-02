@@ -25,10 +25,10 @@ void read()
     tcs.getRawData(&red, &green, &blue, &clear);
 
     SerialCommand::write_u8(kColorSensorData);
-    SerialCommand::write_i16(clear);
-    SerialCommand::write_i16(red);
-    SerialCommand::write_i16(blue);
-    SerialCommand::write_i16(green);
+    SerialCommand::write_u16(clear);
+    SerialCommand::write_u16(red);
+    SerialCommand::write_u16(green);
+    SerialCommand::write_u16(blue);
   }
 }
 

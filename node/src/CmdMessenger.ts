@@ -1,74 +1,50 @@
-import DelimiterParser from "@serialport/parser-delimiter"
+import ByteLength from "@serialport/parser-byte-length"
 import { EventEmitter } from "events"
-import { fromReadable } from "most-node-streams"
-import { Duplex } from "stream"
+import { Duplex, PassThrough, pipeline, Readable } from "stream"
+import { isArray } from "util"
+import Command, { parseCommands } from "./Commands"
+import getBuffer, { SerializedCommand } from "./serializer"
+import socketServer from "./socketServer"
 
-export type Arg = string | number | boolean
-export type Command = [number, Arg[]]
+export class CmdMessenger extends EventEmitter {
+  public readonly readSerial: Readable
 
-class CmdMessenger extends EventEmitter {
-  constructor(protected readonly _serialPort: Duplex) {
+  constructor(public readonly serial: Duplex) {
     super()
-  }
-
-  public readonly commands$ = (() => {
-    const obs = fromReadable(
-      this._serialPort.pipe(new DelimiterParser({ delimiter: ";" }))
+    this.readSerial = pipeline(
+      serial as Readable,
+      new ByteLength({ length: 1 }),
+      new PassThrough()
     )
-      .map(
-        (data: string | Buffer): Command => {
-          const [id, ...args] = (typeof data === "string"
-            ? data
-            : data.toString("ascii")
-          )
-            .trim()
-            .split(",")
-
-          return [parseInt(id), args]
-        }
-      )
-      .multicast()
-
-    obs.forEach(([id, ...args]) => {
-      this.emit(`cmd:${id}`, ...args)
-    })
-
-    return obs
-  })()
-
-  sendCommand(id: number, args?: Arg[]): Promise<void>
-  sendCommand(command: Command): Promise<void>
-  sendCommand(idOrCommand: number | Command, maybeArgs?: Arg[]): Promise<void> {
-    const [id, args] =
-      typeof idOrCommand === "number" ? [idOrCommand, maybeArgs] : idOrCommand
-
-    const command =
-      [
-        "" + id,
-        ...(args || []).map(arg => {
-          switch (typeof arg) {
-            case "string":
-              return arg
-            case "number":
-              return "" + arg
-            case "boolean":
-              return "" + (arg ? 1 : 0)
-            default:
-              throw new Error(`Cannot convert ${arg} to string`)
-          }
-        })
-      ].join(",") + ";"
-
-    console.log("Sending", command)
-
-    return new Promise(f => {
-      this._serialPort.write(command, "ascii", f)
-    })
+    this.startEmitting()
   }
 
-  createSender(id: number) {
-    return (...args: any[]) => this.sendCommand(id, args)
+  private async startEmitting() {
+    for await (const [command, data] of parseCommands(this.readSerial)) {
+      this.emit(`cmd:${command}`, data)
+      process.nextTick(() =>
+        socketServer.emit(
+          "rxcmd",
+          `RX ${Command[command]} ${data == null ? "" : data}`
+        )
+      )
+    }
+  }
+
+  sendCommand(cmd: SerializedCommand) {
+    process.nextTick(() =>
+      socketServer.emit(
+        "rxcmd",
+        `TX ${Command[cmd[0][1] as number]} ${cmd
+          .slice(1)
+          .map(el => (isArray(el) ? el[1] : el.toString("ascii")))}`
+      )
+    )
+    const buf = getBuffer(cmd)
+    this.serial.write(buf)
   }
 }
 
-export default CmdMessenger
+export default function createCmdMessenger(serial: Duplex) {
+  return new CmdMessenger(serial)
+}

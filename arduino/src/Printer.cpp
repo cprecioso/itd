@@ -29,7 +29,7 @@ void printReceipt(byte n)
       F("Carlos Preci  23    1    83JW9JC"),
       F("Jasmijn de B  76    1    87HW9GF"),
       F("Xiaoying Che  29    2    C3H7O28"),
-      F("Xinhe Yao     26    Q    C39AKL8"),
+      F("Xinhe Yao     26    1    C39AKL8"),
       F("Eva van Djik   8    1     CX1389")};
 
   printer.wake();
@@ -87,6 +87,6 @@ void printReceipt(byte n)
   printer.justify('C');
   printer.println(F("Impersonal robbery,"));
   printer.println(F("Personal suffering."));
-  printer.feed(20);
+  printer.feed(30);
 }
 } // namespace Printer

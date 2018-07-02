@@ -17,7 +17,10 @@ unsigned long scanStart;
 void fill(byte i, byte maxJ)
 {
   leds[i].fill_solid(CRGB::Black);
-  leds[i](0, maxJ - 1).fill_solid(chainColors[i]);
+  if (maxJ > 0)
+  {
+    leds[i](0, maxJ - 1).fill_solid(chainColors[i]);
+  }
   FastLED.show();
 }
 

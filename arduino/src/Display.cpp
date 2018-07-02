@@ -7,7 +7,7 @@ TM1637Display display(6, 7);
 bool isRunning;
 unsigned long startTime;
 
-const unsigned int gameDuration = 30000;
+const unsigned int gameDuration = 31000;
 
 void setup()
 {
@@ -28,8 +28,11 @@ void frame()
     const unsigned long curr = millis();
     byte sLeft = (startTime + gameDuration - curr) / 1000;
     if (sLeft <= 0)
+    {
+      sLeft = 0;
       isRunning = false;
-    display.showNumberDec(max(0, sLeft));
+    }
+    display.showNumberDec(sLeft);
   }
 }
 

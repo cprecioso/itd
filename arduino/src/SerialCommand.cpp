@@ -71,6 +71,12 @@ void write_i16(int16_t num)
   Serial.write((uint8_t *)&buffer, 2 * sizeof(int8_t));
 }
 
+void write_u16(uint16_t num)
+{
+  uint8_t buffer[2] = {(uint8_t)(num & 0xff), (uint8_t)(num >> 8)};
+  Serial.write((uint8_t *)&buffer, 2 * sizeof(uint8_t));
+}
+
 void write_i32(int32_t num)
 {
   int8_t buffer[4] = {(int8_t)(num & 0xff), (int8_t)(num >> 8 & 0xff), (int8_t)(num >> 16 & 0xff), (int8_t)(num >> 24 & 0xff)};
