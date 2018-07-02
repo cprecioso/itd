@@ -1,12 +1,13 @@
 import "@babel/polyfill"
 import * as _ from "lodash"
 import { action, autorun, runInAction as ria } from "mobx"
-import { ColorSensorColor, makeColorInterpreter, normalizeColor } from "./color"
+import { fromStream, IObservableStream } from "mobx-utils"
+import fromEvent from "xstream/extra/fromEvent"
+import createColorStream from "./colorStream"
 import Command, { CommandCreator } from "./Commands"
 import { game } from "./gameLogic"
 import state from "./gameState"
 import { commands } from "./serial"
-import socketServer from "./socketServer"
 import GameStage from "./stages"
 
 autorun(() =>
@@ -43,31 +44,20 @@ commands.on(
   action(() => (state.isPrinting = false))
 )
 
-const getClosest = makeColorInterpreter(["red", "white", "green", "#24388a"])
-commands.on(
-  `cmd:${Command.ColorSensorData}`,
-  action((data: ColorSensorColor) => {
-    const color = normalizeColor(data)
-
-    if (state.stage == GameStage.Game) {
-      const i = getClosest(color)
-      if (i != null) {
-        state.currentValues[i]++
-        state.numberOfTokens++
-      }
-    }
-
-    process.nextTick(() =>
-      socketServer.emit(
-        "color",
-        color
-          .reverse()
-          .map((comp, i) => comp * 256 ** i)
-          .reduce((acc, curr) => acc + curr, 0)
-      )
-    )
-  })
+const colorStream$ = createColorStream(
+  fromEvent(commands, `cmd:${Command.ColorSensorData}`)
 )
 
-commands.on(`cmd:${Command.Empty}`, () => {})
-commands.on(`cmd:${Command.Ready}`, () => {})
+const lastColor = fromStream(colorStream$ as IObservableStream<number>)
+autorun(() => {
+  if (state.stage == GameStage.Game) {
+    const i = lastColor.current
+    ria(() => {
+      state.currentValues[i]++
+      state.numberOfTokens
+    })
+  }
+})
+
+// commands.on(`cmd:${Command.Empty}`, () => {})
+// commands.on(`cmd:${Command.Ready}`, () => {})

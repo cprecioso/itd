@@ -1,9 +1,9 @@
-import { PureComponent } from "react";
-import ActionSender from "../src/components/ActionSender";
-import ColorSensorDisplay from "../src/components/ColorSensorDisplay";
-import CommandDisplayer from "../src/components/CommandDisplayer";
-import QuantityDisplay from "../src/components/QuantityDisplay";
-import makeSocket from "../src/socket";
+import { PureComponent } from "react"
+import ActionSender from "../src/components/ActionSender"
+import ColorSensorDisplay from "../src/components/ColorSensorDisplay"
+import CommandDisplayer from "../src/components/CommandDisplayer"
+import QuantityDisplay from "../src/components/QuantityDisplay"
+import makeSocket from "../src/socket"
 
 declare namespace App {
   interface Props {}
@@ -11,6 +11,7 @@ declare namespace App {
     socket?: SocketIOClient.Socket
     stage?: string
     color?: number
+    colorName?: string
     quant?: [number, number, number, number]
     last10Commands: string[]
   }
@@ -24,6 +25,7 @@ class App extends PureComponent<App.Props, App.State> {
 
     socket.on("stage", (stage: string) => this.setState({ stage }))
     socket.on("color", (color: number) => this.setState({ color }))
+    socket.on("colnm", (colorName: string) => this.setState({ colorName }))
     socket.on("quant", (quant: string) =>
       this.setState({
         quant: quant.split(",").map(n => parseInt(n, 10)) as [
@@ -48,14 +50,14 @@ class App extends PureComponent<App.Props, App.State> {
   }
 
   render() {
-    const { stage, color, quant, last10Commands } = this.state
+    const { stage, color, colorName, quant, last10Commands } = this.state
     return (
       <div className="main">
         <div className="stage">
           <h4>Game stage:</h4>
           <h1>{stage || ""}</h1>
         </div>
-        <ColorSensorDisplay color={color} />
+        <ColorSensorDisplay color={color} colorName={colorName} />
         <QuantityDisplay n={quant || [0, 0, 0, 0]} />
         <ActionSender onSendEvent={this.handleSendCommand} />
         <CommandDisplayer commands={last10Commands} />
